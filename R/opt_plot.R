@@ -31,7 +31,7 @@ opt_plot <- function(dat, value, facet = NULL, cols = NULL, title = NULL) {
 
   dat$data <- as.character(dat$data)
   datasets <- unique(dat$data)
-  if(is.null(title)) title = ""
+  if(is.null(title)) title <- ""
 
   dat2 <- dplyr::group_by(dat, data, method, optimizer, fast, cross, loss_type) %>%
     summarize(loss = mean(loss, na.rm = TRUE),
@@ -79,11 +79,11 @@ opt_plot <- function(dat, value, facet = NULL, cols = NULL, title = NULL) {
 
   if(!is.null(facet)) {
     colnames(dat2)[colnames(dat2) == facet] <- "facet"
-    g1 <- g1 + facet_wrap(~dat2$facet, ncol = 1)
+    g1 <- g1 + ggplot2::facet_wrap(~dat2$facet, ncol = 1)
   }
 
   g1 <- g1  +
-    labs(title = title, x = "", y = "Standardized loss") +
+    ggplot2::labs(title = title, x = "", y = "Standardized loss") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
 

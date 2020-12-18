@@ -1,7 +1,7 @@
 #' Performs a specified number of eztune results
 #'
-#' eztune_results creates a line plot with the results of the optimization
-#' tests.
+#' eztune_results runs eztune with the specified arguments. It saves
+#' a matrix with the results.
 #' @param x Matrix or data frame containing the dependent variables.
 #' @param y Vector of responses. Can either be a factor or a numeric vector.
 #' @param data_name Name of the dataset. Used to name the output file and
@@ -32,17 +32,32 @@
 #' and the MSE will be use for models with a continuous model.
 #' @param iterations Number of times to run the model.
 #' @param path Where the file should be saved.
-#' @return Returns a parallel coordinate plot created by ggplot.
-#' The x-axis shows the different optimization methods used, the
-#' y-axis shows the standardized error rate for each dataset.
-#' Within each dataset, the optimization method with the largest
-#' loss is assigned a value of 1 and the smallest is assigned a
-#' value of 0. If a faceting variable is selected, standardization
-#' will be done regardless of the faceted variable. Standardizing is
-#' done within each dataset so each dataset should have a value of 1
-#' and a value of 0 on the graph. Datasets that are all NA for an
-#' optimization method are denoted with a hollow circle and a value
-#' of 1.
+#' @return Saves a matrix to the indicated path that contains the results
+#' for each of the runs. The final file contains the following variables:
+#'
+#' \item{data}{Name of the dataset.}
+#' \item{method}{Type of model that was fit. It will an abbreviation
+#' for adaboost, elastic net, gradient boosting machines, or
+#' support vector machines.}
+#' \item{optimizer}{Type of optimizer used. It will either be ga
+#' for a genetic algorithm or hjn for a Hookes-Jeeves algorithm.}
+#' \item{fast}{The argument passed to the fast option. If it is a 1,
+#' a value of TRUE was passed and if it was 0 a value of FALSE was
+#' passed.}
+#' \item{cross}{n for n-fold cross-validation in the optimization. It
+#' was only used if fast was FALSE.}
+#' \item{loss_type}{Type of loss used as an optimizer. If the dataset has a
+#' continuous response, the options are mse for mean squared error and
+#' mae for mean absolute error. If the response is binary, the options
+#' are acc for accuracy and auc for area under the ROC curve.}
+#' \item{time}{Number of seconds to complete the calculations.}
+#' \item{loss}{Loss value returned by eztune.}
+#' \item{loss_mse_acc_10}{Estimate of the accuracy or mean squared error
+#' as computed using the eztune_cv function with 10 fold cross validation.}
+#' \item{loss_mae_auc_10}{Estimate of the area under the curve or mean absolute
+#' error as computed using the eztune_cv function with 10 fold cross
+#' validation.}
+
 #'
 #' @seealso \code{\link{load_opt_data}}, \code{\link{average_metric}}
 #'
@@ -63,16 +78,19 @@ eztune_results <- function(x, y, data_name, method = NULL, optimizer = NULL,
   loc <- paste(path, "/", file_name, ".csv", sep = "")
   loc <- gsub("//", "/", loc)
 
-  mat <- data.frame(matrix(nrow = iterations, ncol = 9))
+  mat <- data.frame(matrix(nrow = iterations, ncol = 10))
   colnames(mat) <- c("data", "method", "optimizer", "fast", "cross",
-                     "time", "loss", "loss_mse_acc_10", "loss_mae_auc_10")
+                     "loss_type", "time", "loss", "loss_mse_acc_10",
+                     "loss_mae_auc_10")
 
   mat$data <- data_name
   mat$method <- method
   mat$optimizer <- optimizer
   mat$fast <- fast
   mat$cross <- cross
-  mat$loss <- loss
+  mat$loss_type <- loss
+
+  write.csv(mat, loc, quote = FALSE, row.names = FALSE)
 
   for(i in 1:iterations) {
 
