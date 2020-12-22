@@ -70,8 +70,7 @@ eztune_results <- function(x, y, data_name, method = NULL, optimizer = NULL,
                            iterations = 10, path = ".") {
 
   if(is.null(x) | is.null(y) | is.null(data_name) | is.null(method) |
-     is.null(optimizer) | is.null(fast) | is.null(cross) |
-     is.null(loss)) {
+     is.null(optimizer) | is.null(fast) | is.null(loss)) {
     stop("x, y, data_name, method, optimizer, fast, cross, loss, and path all must be specified")
   }
 
