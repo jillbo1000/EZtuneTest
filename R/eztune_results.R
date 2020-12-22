@@ -22,7 +22,8 @@
 #' the optimization criterion.
 #' @param cross If an integer k > 1 is specified, k-fold cross-validation
 #' is used to fit the model. This method is very slow for large datasets.
-#' This parameter is ignored unless fast = FALSE.
+#' If it is "Resub" it will do resubstitution. This parameter is ignored
+#' unless fast = FALSE.
 #' @param loss The type of loss function used for optimization. Options for
 #' models with a binary response are "class" for classification error and
 #' "auc" for area under the curve. Options for models with a continuous
@@ -74,7 +75,9 @@ eztune_results <- function(x, y, data_name, method = NULL, optimizer = NULL,
     stop("x, y, data_name, method, optimizer, fast, cross, loss, and path all must be specified")
   }
 
-  file_name <- paste(data_name, method, optimizer, fast, cross, loss, sep = "_")
+  if(is.null(cross)) cross2 <- "resub" else cross2 <- cross
+
+  file_name <- paste(data_name, method, optimizer, fast, cross2, loss, sep = "_")
   loc <- paste(path, "/", file_name, ".csv", sep = "")
   loc <- gsub("//", "/", loc)
 
@@ -87,7 +90,7 @@ eztune_results <- function(x, y, data_name, method = NULL, optimizer = NULL,
   mat$method <- method
   mat$optimizer <- optimizer
   mat$fast <- fast
-  mat$cross <- cross
+  mat$cross <- cross2
   mat$loss_type <- loss
 
   write.csv(mat, loc, quote = FALSE, row.names = FALSE)

@@ -44,7 +44,8 @@ the optimization criterion.}
 
 \item{cross}{If an integer k > 1 is specified, k-fold cross-validation
 is used to fit the model. This method is very slow for large datasets.
-This parameter is ignored unless fast = FALSE.}
+If it is "Resub" it will do resubstitution. This parameter is ignored
+unless fast = FALSE.}
 
 \item{loss}{The type of loss function used for optimization. Options for
 models with a binary response are "class" for classification error and
