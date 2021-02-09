@@ -16,7 +16,8 @@ Imports:
     glmnet, 
     e1071, 
     gbm, 
-    ada
+    ada, 
+    stringr
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

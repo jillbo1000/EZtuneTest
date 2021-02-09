@@ -2,6 +2,9 @@
 
 export(create_grid)
 export(eztune_results)
+export(eztune_table)
+export(get_best_grid)
+export(get_grid_data)
 export(grid_search)
 export(load_opt_data)
 export(opt_dot_plot)

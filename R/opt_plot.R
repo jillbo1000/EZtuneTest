@@ -10,6 +10,7 @@
 #' variable is optimizer, but other options include data or method.
 #' @param cols A color palette to use with the data. If it is not
 #' specified, the Dark2 palette from color brewer will be used.
+#' @param title Optional character string to use a title for the plot.
 #' @return Returns a parallel coordinate plot created by ggplot.
 #' The x-axis shows the different optimization methods used, the
 #' y-axis shows the standardized error rate for each dataset.
@@ -19,7 +20,7 @@
 #' will be done regardless of the faceted variable. Standardizing is
 #' done within each dataset so each dataset should have a value of 1
 #' and a value of 0 on the graph. Datasets that are all NA for an
-#' optimization method are denoted with a hollow circle and a value
+#' optimization method are denoted with a star and a value
 #' of 1.
 #'
 #' @seealso \code{\link{load_opt_data}}, \code{\link{average_metric}}
@@ -27,14 +28,15 @@
 #' @export
 #'
 
-opt_plot <- function(dat, value, facet = NULL, cols = NULL, title = NULL) {
+opt_plot <- function(dat, value, facet = "optimizer", cols = NULL, title = NULL) {
 
   dat$data <- as.character(dat$data)
   datasets <- unique(dat$data)
   if(is.null(title)) title <- ""
 
   dat2 <- dplyr::group_by(dat, data, method, optimizer, fast, cross, loss_type) %>%
-    summarize(loss = mean(loss, na.rm = TRUE),
+    dplyr::summarize(time = mean(time, na.rm = TRUE),
+                     loss = mean(loss, na.rm = TRUE),
               loss_mse_acc_10 = mean(loss_mse_acc_10, na.rm =TRUE),
               loss_mae_auc_10 = mean(loss_mae_auc_10, na.rm =TRUE)) %>%
     dplyr::ungroup()
@@ -42,7 +44,7 @@ opt_plot <- function(dat, value, facet = NULL, cols = NULL, title = NULL) {
   colnames(dat2)[colnames(dat2) == value] <- "value"
 
   dat2 <- dplyr::group_by(dat2, data) %>%
-    mutate(ErrStd = ((value - min(value, na.rm = TRUE)) /
+    dplyr::mutate(ErrStd = ((value - min(value, na.rm = TRUE)) /
                        (max(value, na.rm = TRUE) - min(value, na.rm = TRUE))),
            missing = ifelse(is.na(value), "Yes", "No"),
            value = ifelse(is.na(value), 1, value)) %>%
@@ -52,17 +54,23 @@ opt_plot <- function(dat, value, facet = NULL, cols = NULL, title = NULL) {
     dat2$opt <- ifelse(dat2$fast != 0,
                        paste("fast", dat2$fast, dat2$loss_type, sep = "_"),
                        paste("CV", dat2$cross, dat2$loss_type, sep = "_"))
+    dat2$optimizer <- ifelse(dat2$optimizer == "ga", "Genetic algorithm",
+                             "Hooke-Jeeves")
   } else if(facet == "loss_type") {
     dat2$opt <- ifelse(dat2$fast != 0,
                        paste("fast", dat2$fast, dat2$optimizer, sep = "_"),
                        paste("CV", dat2$cross, dat2$optimizer, sep = "_"))
+    dat2$loss_type <- ifelse(nchar(dat2$loss_type) == 3, toupper(dat2$loss_type),
+                             "Classification error")
   } else if(facet == "method") {
     dat2$opt <- ifelse(dat2$fast != 0,
                        paste("fast", dat2$fast, dat2$loss_type, sep = "_"),
                        paste("CV", dat2$cross, dat2$loss_type, sep = "_"))
+    dat2$method <- ifelse(dat2$method == "ada", "Adaboost", toupper(dat2$method))
   }
 
-  dat2$missing <- factor(dat2$missing, levels = c("Yes", "No"))
+  dat2$Missing <- factor(dat2$missing, levels = c("No", "Yes"))
+  dat2$ErrStd2 <- ifelse(is.na(dat2$ErrStd), 1, dat2$ErrStd)
   dat2 <- dat2[order(dat2$opt), ]
 
   if(is.null(cols)) {
@@ -71,11 +79,16 @@ opt_plot <- function(dat, value, facet = NULL, cols = NULL, title = NULL) {
 
   # Note that alpha makes the lines disappear in the graph view window, but
   # they are there when you open a zoom window or save to a file.
-  g1 <- ggplot2::ggplot(dat2, ggplot2::aes(x = opt, y = ErrStd, group = factor(data),
-                                           color = factor(data), shape = missing)) +
-    ggplot2::geom_point(show.legend = FALSE) +
-    ggplot2::geom_line(ggplot2::aes(color = factor(data)), alpha = 0.7, lwd = 1.2) +
-    ggplot2::scale_color_manual(name = "", values = cols)
+  g1 <- ggplot2::ggplot(dat2, ggplot2::aes(x = opt, y = ErrStd,
+                                           group = factor(data),
+                                           color = factor(data))) +
+    ggplot2::geom_line(ggplot2::aes(color = factor(data)), alpha = 0.7,
+                       lwd = 1.2) +
+    ggplot2::geom_point(ggplot2::aes(x = opt, y = ErrStd2,
+                                     shape = Missing),
+                        show.legend = TRUE) +
+    ggplot2::scale_color_manual(name = "", values = cols) +
+    ggplot2::scale_shape_manual(name = "Missing", values = c(16, 8))
 
   if(!is.null(facet)) {
     colnames(dat2)[colnames(dat2) == facet] <- "facet"

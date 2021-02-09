@@ -4,7 +4,7 @@
 \alias{opt_plot}
 \title{Makes a line plot of the results from the optimization tests}
 \usage{
-opt_plot(dat, value, facet = NULL, cols = NULL, title = NULL)
+opt_plot(dat, value, facet = "optimizer", cols = NULL, title = NULL)
 }
 \arguments{
 \item{dat}{Dataset created from load_opt_data or with several
@@ -18,6 +18,8 @@ variable is optimizer, but other options include data or method.}
 
 \item{cols}{A color palette to use with the data. If it is not
 specified, the Dark2 palette from color brewer will be used.}
+
+\item{title}{Optional character string to use a title for the plot.}
 }
 \value{
 Returns a parallel coordinate plot created by ggplot.
@@ -29,7 +31,7 @@ value of 0. If a faceting variable is selected, standardization
 will be done regardless of the faceted variable. Standardizing is
 done within each dataset so each dataset should have a value of 1
 and a value of 0 on the graph. Datasets that are all NA for an
-optimization method are denoted with a hollow circle and a value
+optimization method are denoted with a star and a value
 of 1.
 }
 \description{

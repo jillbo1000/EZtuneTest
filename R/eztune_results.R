@@ -112,7 +112,7 @@ eztune_results <- function(x, y, data_name, method = NULL, optimizer = NULL,
     }
 
     t2 <- Sys.time()
-    mat$time[i] <- as.numeric(t2 - t1)
+    mat$time[i] <- as.numeric(difftime(t2, t1, units = "secs"))
 
     write.csv(mat, loc, quote = FALSE, row.names = FALSE)
   }
