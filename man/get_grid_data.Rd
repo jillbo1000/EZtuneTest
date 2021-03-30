@@ -5,17 +5,68 @@
 \title{Makes a data.frame that contains the best error rates from a
 grid search}
 \usage{
-get_grid_data(path, ...)
+get_grid_data(
+  path = ".",
+  pattern = NULL,
+  dataset = "Data",
+  method = NULL,
+  model_type = NULL
+)
 }
 \arguments{
-\item{grid_dat}{data.frame obtained from get_grid_data or with
-several datasets from get_grid_data combined with rbind.}
+\item{path}{File path to folder with the files that hold the
+grid results.}
+
+\item{pattern}{An optional character vector that can be used to
+select a subset of files in the folder.}
+
+\item{dataset}{Name of the dataset for which the grid search
+was done.}
+
+\item{method}{A character string that specifies the method used to create
+the grid. Choices are "svm", "gbm", "en", and "ada". This is
+added to the datasets to minimize ambiguity in downstream analysis.}
+
+\item{model_type}{Character string of either "binary" or "regression"
+that specifies the type of model. This is needed because some of
+the earlier grid searches had inconsistent loss scales.}
 }
 \value{
-Returns a data.frame with the names of the datasets
-in the first column and the best error rate in the second
-column. The first column is named "Data" and the second column
-is named "Best"
+Returns a list with a series of data.frames that can
+be used to create plots of the grid surface or find the best
+error rates. Note that some of the datasets in the list may have
+more observations than indicated by the measures. This is because
+there are a substantial number of ties. The datasets in the list are:
+\item{data}{Complete dataset of grid results.}
+\item{dat20loss}{Dataset containing only the best 20\% in terms of loss
+(classification error, AUC, MSE, or MAE).}
+\item{dat10loss}{Dataset containing only the best 10\% in terms of loss.}
+\item{dat5loss}{Dataset containing only the best 5\% in terms of loss.}
+\item{dat1loss}{Dataset containing only the best 1\% in terms of loss.}
+\item{dat20time}{Dataset containing only the best 20\% in terms of computation time.}
+\item{dat10time}{Dataset containing only the best 10\% in terms of computation time.}
+\item{dat5time}{Dataset containing only the best 5\% in terms of computation time.}
+\item{dat1time}{Dataset containing only the best 1\% in terms of computation time.}
+\item{top20loss}{Twenty grid locations with the best loss.}
+\item{top20time}{Twenty grid locations with the best computation times.}
+Each of the datasets has the following variables:
+\item{Data}{Name of the dataset used to create the grid.}
+\item{Method}{Method used for EZtune. Should be "svm", "gbm", "en", or
+"ada". It will be exactly as it is entered into the method argument.}
+\item{Tuning_Variables}{These fields contain the tuning variables for the
+method. For svm they are Cost and Gamma (Note that Gamma is really
+log2(Gamma)), and Epsilon for regression models; gbm is NumTrees, MinNode,
+Shrinkage, IntDepth; en is Alpha and logLambda; ada is Nu, Iter, and
+MaxDepth.}
+\item{Loss}{The loss measure used in the grid search. It is typically
+classification error or MSE, but it can be AUC or MAE as well. It is
+computed using 10-fold cross validation. }
+\item{LossUCL}{A measure of stability for the Loss measure. The test loss
+for each of the folds in 10-fold cross validation were used to compute a
+95\% upper confidence interval for the loss. If it differs substantially
+from the Loss it indicates that results for the model with those tuning
+parameters are unstable. }
+\item{Time}{Computation time in seconds.}
 }
 \description{
 get_grid_data creates a data.frame that has the datasets in
@@ -24,5 +75,5 @@ search in the second column.
 }
 \seealso{
 \code{\link{grid_search}}, \code{\link{eztune_table}},
-\code{\link{grid_search}},
+\code{\link{get_best_grid}}, \code{\link{grid_plot}}
 }

@@ -17,7 +17,12 @@ Imports:
     e1071, 
     gbm, 
     ada, 
-    stringr
+    stringr, 
+    rsample, 
+    tidymodels,
+    dials, 
+    kernlab, 
+    xgboost
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

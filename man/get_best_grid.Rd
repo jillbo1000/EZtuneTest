@@ -5,15 +5,15 @@
 \title{Makes a data.frame that contains the best error rates from a
 grid search}
 \usage{
-get_best_grid(grid_dat)
+get_best_grid(grid_data)
 }
 \arguments{
-\item{grid_dat}{data.frame obtained from get_grid_data or with
+\item{grid_data}{data.frame obtained from get_grid_data or with
 several datasets from get_grid_data combined with rbind.}
 }
 \value{
 Returns a data.frame with the names of the datasets
-in the first column and the best error rate in the second
+in the first column and the best loss value in the second
 column. The first column is named "Data" and the second column
 is named "Best"
 }

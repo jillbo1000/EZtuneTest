@@ -4,10 +4,10 @@
 #' get_best_grid creates a data.frame that has the datasets in
 #' the first column and the best error rate obtained in the grid
 #' search in the second column.
-#' @param grid_dat data.frame obtained from get_grid_data or with
+#' @param grid_data data.frame obtained from get_grid_data or with
 #' several datasets from get_grid_data combined with rbind.
 #' @return Returns a data.frame with the names of the datasets
-#' in the first column and the best error rate in the second
+#' in the first column and the best loss value in the second
 #' column. The first column is named "Data" and the second column
 #' is named "Best"
 #'
@@ -17,6 +17,11 @@
 #' @export
 #'
 
-get_best_grid <- function(grid_dat) {
+get_best_grid <- function(grid_data) {
+
+  best <- dplyr::group_by(grid_data, Data) %>%
+    dplyr::summarize(Best = min(Loss, na.rm = TRUE))
+
+  as.data.frame(best)
 
 }

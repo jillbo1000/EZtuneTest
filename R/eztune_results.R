@@ -15,7 +15,7 @@
 #' observations when optimizing to speed up calculation time. A value of
 #' TRUE will use the smaller of 50% of the data or 200 observations for
 #' model fitting, a number between 0 and 1 specifies the proportion of
-#' data to be used to fit the model, and a postive integer specifies the
+#' data to be used to fit the model, and a positive integer specifies the
 #' number of observations to be used to fit the model. A model is computed
 #' using a random selection of data and the remaining data are used to
 #' validate model performance. The validation error measure is used as

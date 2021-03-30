@@ -36,8 +36,8 @@ eztune_table <- function(dat, value = "loss_mse_acc_10", best_grid = NULL) {
   colnames(dat)[colnames(dat) == value] <- "value"
 
   summ <- dplyr::group_by(dat, data, optimizer, fast, cross) %>%
-    dplyr::summarize(mean = mean(value, rm.na = TRUE),
-                     time = mean(time, rm.na = TRUE))
+    dplyr::summarize(mean = mean(value, na.rm = TRUE),
+                     time = mean(time, na.rm = TRUE))
   summ$round <- rep(NA, nrow(summ))
   summ$int <- rep(NA, nrow(summ))
   for(i in 1:nrow(summ)) {
