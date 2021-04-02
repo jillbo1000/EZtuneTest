@@ -102,8 +102,6 @@ ez_benchmark <- function(x, y, name = "Data", method = "svm", optimizer = "hjn",
   out <- data.frame(data = name, package = "EZtune", method = method,
                     optimizer = test, assess = assess, acc_rmse = acc_rmse,
                     auc_mae = auc_mae)
-  colnames(out2) <- c("acc_rmse", "auc_mae")
-  rownames(out2) <- c(1, 2)
 
   if(loss == "default") {
     if(grepl(".bin", meth)) {
