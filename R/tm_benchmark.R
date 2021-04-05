@@ -74,7 +74,7 @@ tm_benchmark <- function(x, y, name = "Data", method = "svm", test = "grid",
       parsnip::set_engine("kernlab") %>%
       parsnip::set_mode("classification")
     pow <- 2
-    mets <- yardstick::metric_set(accuracy, roc_auc)
+    mets <- yardstick::metric_set(yardstick::accuracy, yardstick::roc_auc)
 
   } else if(meth == "gbm.bin") {
     tune_mod <- parsnip::boost_tree(trees = tune(), tree_depth = tune(),
@@ -100,7 +100,7 @@ tm_benchmark <- function(x, y, name = "Data", method = "svm", test = "grid",
       parsnip::set_engine("xgboost") %>%
       parsnip::set_mode("regression")
     pow <- 4
-    mets <- yardstick::metric_set(rmse, mae)
+    mets <- yardstick::metric_set(yardstick::rmse, yardstick::mae)
 
   }
 
