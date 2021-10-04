@@ -1,4 +1,4 @@
-#' Tunes a model via tidymodels and returns
+#' Tunes a model via \code{EZtune} and returns the benchmarking results
 #'
 #' \code{ez_benchmark} tunes a model with eztune and returns a one row
 #' \code{data.frame} with the results. \pkg{rsample} is used to split
@@ -40,9 +40,8 @@
 #' \item{auc_mae}{The best AUC or MAE obtained from the model as
 #' determined by a validation dataset.}
 #' \item{time}{Time to complete the calculations in seconds.}
-#' as computed using the eztune_cv function with 10 fold cross validation.}
 #' The models are verified using rsample to split the data into  training
-#' and testing datasets.}
+#' and testing datasets.
 #'
 #' @seealso \code{\link{tm_benchmark}}, \code{\link{EZtune::eztune}}
 #'
@@ -68,7 +67,7 @@ ez_benchmark <- function(x, y, name = "Data", method = "svm", optimizer = "hjn",
 
   t1 <- Sys.time()
 
-  mod <- EZtune::eztune(dat_train[, -1],dat_train$y,  method = method,
+  mod <- EZtune::eztune(dat_train[, -1], dat_train$y, method = method,
                         optimizer = optimizer, fast = fast, cross = cross,
                         loss = loss)
 
@@ -80,8 +79,8 @@ ez_benchmark <- function(x, y, name = "Data", method = "svm", optimizer = "hjn",
   res <- predict(mod, dat_test)
 
   if(is.data.frame(res)) {
-    acc_rmse <- yardstick::roc_auc_vec(truth = dat_test[, 1], estimate = res[, 2])
-    auc_mae <- yardstick::accuracy_vec(truth = dat_test[, 1], estimate = res[, 1])
+    acc_rmse <- yardstick::accuracy_vec(truth = dat_test[, 1], estimate = res[, 1])
+    auc_mae <- yardstick::roc_auc_vec(truth = dat_test[, 1], estimate = res[, 2])
   } else {
     acc_rmse <- yardstick::rmse_vec(truth = dat_test[, 1], estimate = res)
     auc_mae <- yardstick::mae_vec(truth = dat_test[, 1], estimate = res)

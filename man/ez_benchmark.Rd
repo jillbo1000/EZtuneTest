@@ -2,7 +2,7 @@
 % Please edit documentation in R/ez_benchmark.R
 \name{ez_benchmark}
 \alias{ez_benchmark}
-\title{Tunes a model via tidymodels and returns}
+\title{Tunes a model via \code{EZtune} and returns the benchmarking results}
 \usage{
 ez_benchmark(
   x,
@@ -45,7 +45,25 @@ NULL or a positive integer to represent the number of folds. See
 \code{\link{EZtune::eztune}} for more information.}
 }
 \value{
-
+Saves a matrix to the indicated path that contains the results
+for each of the runs. The final file contains the following variables:
+\item{data}{Name of the dataset.}
+\item{package}{This will always be "EZtune".}
+\item{method}{Type of model that was fit. It will "gbm" for
+gradient boosting machines, "svm" for support vector machines,
+"en" for elastic net, or "ada" for adaboost.}
+\item{optimizer}{Optimization method. It will be "Genetic algorithm" or
+"Hooke-Jeeves".}
+\item{assess}{The method used to assess the model during tuning. It will
+be either cross-validation or some version of FAST.}
+\item{tuned_on}{Metric that was used as the loss function.}
+\item{acc_rmse}{The best accuracy or RMSE obtained from the model as
+determined by a validation dataset.}
+\item{auc_mae}{The best AUC or MAE obtained from the model as
+determined by a validation dataset.}
+\item{time}{Time to complete the calculations in seconds.}
+The models are verified using rsample to split the data into  training
+and testing datasets.
 }
 \description{
 \code{ez_benchmark} tunes a model with eztune and returns a one row

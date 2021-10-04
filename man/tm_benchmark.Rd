@@ -2,7 +2,7 @@
 % Please edit documentation in R/tm_benchmark.R
 \name{tm_benchmark}
 \alias{tm_benchmark}
-\title{Tunes a model via tidymodels}
+\title{Tunes a model via tidymodels and returns benchmarking results}
 \usage{
 tm_benchmark(
   x,
@@ -36,7 +36,23 @@ grid. This is ignored if iterative Bayesian optimization is selected.}
 This is ignored if test = "grid"}
 }
 \value{
-
+Returns a single row matrix with the following elements:
+\item{data}{Name of the dataset.}
+\item{package}{This will always be "tidymodels".}
+\item{method}{Type of model that was fit. It will gbm for
+gradient boosting machines or svm for support vector machines.}
+\item{optimizer}{Type of optimizer used. It will be Grid  or
+Iterative Bayes.}
+\item{assess}{The method used to assess the model during tuning. For
+tidymodels it will be cross-validation.}
+\item{tuned_on}{Metric that was used as the loss function}
+\item{acc_rmse}{The best accuracy or RMSE obtained from the model as
+determined by a validation dataset.}
+\item{auc_mae}{The best AUC or MAE obtained from the model as
+determined by a validation dataset.}
+\item{time}{Time to complete the calculations in seconds.}
+The models are verified using rsample to split the data into  training
+and testing datasets.
 }
 \description{
 tm_benchmark tunes a model with tidymodels and returns the accuracy

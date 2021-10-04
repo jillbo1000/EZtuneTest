@@ -1,4 +1,4 @@
-#' Tunes a model via tidymodels
+#' Tunes a model via tidymodels and returns benchmarking results
 #'
 #' tm_benchmark tunes a model with tidymodels and returns the accuracy
 #' results and computation time in seconds.
@@ -30,9 +30,8 @@
 #' \item{auc_mae}{The best AUC or MAE obtained from the model as
 #' determined by a validation dataset.}
 #' \item{time}{Time to complete the calculations in seconds.}
-#' as computed using the eztune_cv function with 10 fold cross validation.}
 #' The models are verified using rsample to split the data into  training
-#' and testing datasets.}
+#' and testing datasets.
 #'
 #' @seealso \code{\link{ez_benchmark}}, \code{\link{EZtune::eztune}}
 #'
@@ -44,6 +43,9 @@ tm_benchmark <- function(x, y, name = "Data", method = "svm", test = "grid",
 
   dat <- data.frame(y, x)
   colnames(dat)[1] <- "y"
+  for(i in 1:length(colnames(dat))) {
+    if(is.character((dat[, i]))) dat[, i] <- as.factor(dat[, i])
+  }
 
   #================= Partition data and create folds for CV
 
