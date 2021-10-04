@@ -59,9 +59,11 @@ en_benchmark <- function(x, y, name = "Data", loss = "default") {
     dat_split <- rsample::initial_split(dat, strata = y)
     meth <- paste0(method, ".bin")
     if(loss == "default" ) loss <- "class"
+    family = "binomial"
   } else {
     dat_split <- rsample::initial_split(dat)
     meth <- paste0(method, ".reg")
+    family <- "gaussian"
     if(loss == "default") loss <- "mse"
   }
 
@@ -77,7 +79,8 @@ en_benchmark <- function(x, y, name = "Data", loss = "default") {
   alpha_cv <- NULL
   for(i in 1:length(alpha)) {
     alpha_cv[[i]] <- glmnet::cv.glmnet(x = as.matrix(dat_train[, -1]),
-                                       y = dat_train[, 1], type.measure = loss,
+                                       y = dat_train[, 1], family = family,
+                                       type.measure = loss,
                                        foldid = foldid, alpha = alpha[i])
     alpha_data[i, -1] <- c(alpha_cv[[i]]$lambda.min, alpha_cv[[i]]$lambda.1se,
                            alpha_cv[[i]]$cvm[alpha_cv[[i]]$lambda == alpha_cv[[i]]$lambda.min],
@@ -85,11 +88,13 @@ en_benchmark <- function(x, y, name = "Data", loss = "default") {
   }
 
   mod.1se <- glmnet::glmnet(x = as.matrix(dat_train[, -1]), y = dat_train[, 1],
+                            family = family,
                             lambda = alpha_data$lambda.1se[alpha_data$loss.1se == min(alpha_data$loss.1se)],
                             alpha = alpha_data$alpha[alpha_data$loss.1se == min(alpha_data$loss.1se)],
                             type.measure = loss)
 
   mod.min <- glmnet::glmnet(x = as.matrix(dat_train[, -1]), y = dat_train[, 1],
+                            family = family,
                             lambda = alpha_data$lambda.min[alpha_data$loss.min == min(alpha_data$loss.min)],
                             alpha = alpha_data$alpha[alpha_data$loss.min == min(alpha_data$loss.min)],
                             type.measure = loss)
@@ -99,14 +104,22 @@ en_benchmark <- function(x, y, name = "Data", loss = "default") {
   t2 <- Sys.time()
   run_time <- as.numeric(difftime(t2, t1, units = "secs"))
 
-  res.1se <- predict(mod.1se, as.matrix(dat_test[, -1]))
-  res.min <- predict(mod.min, as.matrix(dat_test[, -1]))
+  res.1se <- predict(mod.1se, as.matrix(dat_test[, -1]), type = "response")
+  res.min <- predict(mod.min, as.matrix(dat_test[, -1]), type = "response")
 
-  if(is.data.frame(res.1se)) {
-    acc_rmse.1se <- yardstick::accuracy_vec(truth = dat_test[, 1], estimate = res.1se[, 1])
-    auc_mae.1se <- yardstick::roc_auc_vec(truth = dat_test[, 1], estimate = res.1se[, 2])
-    acc_rmse.min <- yardstick::accuracy_vec(truth = dat_test[, 1], estimate = res.min[, 1])
-    auc_mae.min <- yardstick::roc_auc_vec(truth = dat_test[, 1], estimate = res.min[, 2])
+  if(family == "binomial") {
+    dat_test[, 1] <- as.factor(as.numeric(dat_test[, 1]) - 1)
+    res.1se.r <- as.factor(round(res.1se))
+    res.min.r <- as.factor(round(res.min))
+  }
+
+  if(family == "binomial") {
+    acc_rmse.1se <- yardstick::accuracy_vec(truth = dat_test[, 1], estimate = res.1se.r)
+    auc_mae.1se <- yardstick::roc_auc_vec(truth = dat_test[, 1], estimate = res.1se[, 1],
+                                          event_level = "second")
+    acc_rmse.min <- yardstick::accuracy_vec(truth = dat_test[, 1], estimate = res.min.r)
+    auc_mae.min <- yardstick::roc_auc_vec(truth = dat_test[, 1], estimate = res.min[, 1],
+                                          event_level = "second")
   } else {
     acc_rmse.1se <- yardstick::rmse_vec(truth = dat_test[, 1], estimate = res.1se[, 1])
     auc_mae.1se <- yardstick::mae_vec(truth = dat_test[, 1], estimate = res.1se[, 1])
