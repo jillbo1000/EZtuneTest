@@ -89,14 +89,14 @@ en_benchmark <- function(x, y, name = "Data", loss = "default") {
 
   mod.1se <- glmnet::glmnet(x = as.matrix(dat_train[, -1]), y = dat_train[, 1],
                             family = family,
-                            lambda = alpha_data$lambda.1se[alpha_data$loss.1se == min(alpha_data$loss.1se)],
-                            alpha = alpha_data$alpha[alpha_data$loss.1se == min(alpha_data$loss.1se)],
+                            lambda = alpha_data$lambda.1se[alpha_data$loss.1se == min(alpha_data$loss.1se)][1],
+                            alpha = alpha_data$alpha[alpha_data$loss.1se == min(alpha_data$loss.1se)][1],
                             type.measure = loss)
 
   mod.min <- glmnet::glmnet(x = as.matrix(dat_train[, -1]), y = dat_train[, 1],
                             family = family,
-                            lambda = alpha_data$lambda.min[alpha_data$loss.min == min(alpha_data$loss.min)],
-                            alpha = alpha_data$alpha[alpha_data$loss.min == min(alpha_data$loss.min)],
+                            lambda = alpha_data$lambda.min[alpha_data$loss.min == min(alpha_data$loss.min)][1],
+                            alpha = alpha_data$alpha[alpha_data$loss.min == min(alpha_data$loss.min)][1],
                             type.measure = loss)
 
   #========================= Make output
